@@ -1,0 +1,142 @@
+<!-- 
+Albert Cao
+07/24/21
+
+### Question 3
+
+Implement a 5-star widget for an eCommerce site for users to record a product rating. The widget displays
+a horizontal row of stars that are either outlined or black, according to the product rating, from left to right.
+E.g. ★★★☆☆ = rating of 3.
+
+Multiple 5-star widgets can be present on a single page. If a user has not rated a product, the widget will
+have 5 outlined stars (☆☆☆☆☆). Each product on the page has a UUID.
+Hovering over the Nth star will light up stars 1 to N with a grey colour (e.g. ★★★★☆). Clicking a star will
+record the rating by sending a request to a web server with enough information to record the product and
+the rating. After clicking, the widget will then display the rating the user submitted with black stars (e.g.
+★★★★☆). Submitting the rating is handled without refreshing the page.
+
+You may assume that you have access to all ES2017 features, and do not need to make it compatible with
+IE11. Assume that there is a REST endpoint setup. You may use JavaScript libraries (e.g. React, jQuery) to
+assist in building the widget, provided that they do not solve the entire problem. You do not need to handle
+AuthN/AuthZ for submitting the rating and can assume that the request includes authentication information
+to identify the customer (but you do need to be able to pass along the product ID).
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <!-- Head -->
+    <head>
+        <title>Albert Cao - Picovoice Interview - Question 3</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    </head>
+    <!-- Style -->
+    <style>
+        /* Body styling */
+        body {
+            background: url('images/background.jpeg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+
+        /* Rating widget styling */
+        .rating-list {
+            display: inline-block;
+            list-style: none;
+        }
+
+        .rating-list li {
+            float: right;
+            color: black;
+            padding: 10px 5px;
+        }
+
+        /* Using ~ (general sibling combinator) to apply color on hover. */
+        .rating-list li:hover,
+        .rating-list li:hover ~ li {
+            color: grey;
+        }
+
+        /* Misc. styling */
+        .productId {
+            display: none;
+        }
+
+        .productImage {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 70%;
+        }
+
+        .title {
+            width: 70vw;
+            height: auto;
+        }
+    </style>
+    <!-- Body -->
+    <body id="body">
+        <!-- Content -->
+        <div class="container">
+            <!-- Header -->
+            <div class="row mt-5 text-center">
+                <div class="col-12">
+                    <img class="title" src="images/title.png">
+                </div>
+            </div>
+            <!-- Products -->
+            <div class="row mt-5 mb-5 text-center">
+                <!-- Bendy stick -->
+                <div class="col-12 col-md-4 mb-5">
+                    <div class="card">
+                        <img class="card-img-top productImage" src="images/bendy.jpeg">
+                        <div class="card-body">
+                            <h5 class="card-title">Bendy Stick</h5>
+                            <p class="card-text">$8,000</p>
+                            <span class="productId" id="456545b3-d7f3-4b27-88b2-359e2922604b"></span>
+                            <button type="button" class="btn btn-outline-info mb-2">SOLD OUT!</button>
+                            <!-- Widget script here -->
+                            <div class="bendy-widget"></div>
+                            <script id="bendy-widget" src="js/AlbertCaoQ3.js"></script>
+                        </div>
+                    </div>
+                </div>
+                <!-- Straight stick -->
+                <div class="col-12 col-md-4 mb-5">
+                    <div class="card">
+                        <img class="card-img-top productImage" src="images/straight.jpg">
+                        <div class="card-body">
+                            <h5 class="card-title">Straight Stick</h5>
+                            <p class="card-text">$10,000</p>
+                            <span class="productId" id="1e304561-3471-4d14-9d6f-242b463073b3"></span>
+                            <button type="button" class="btn btn-outline-info mb-2">SOLD OUT!</button>
+                            <!-- Widget script here -->
+                            <div class="straight-widget"></div>
+                            <script id="straight-widget" src="js/AlbertCaoQ3.js"></script>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pile o' sticks -->
+                <div class="col-12 col-md-4 mb-5">
+                    <div class="card">
+                        <img class="card-img-top productImage mt-1 mb-3" src="images/pile.jpg">
+                        <div class="card-body">
+                            <h5 class="card-title">Pile O' Sticks</h5>
+                            <p class="card-text">$14,000</p>
+                            <span class="productId" id="ddef9f9f-ebfb-421c-967d-85d419ddcad7"></span>
+                            <button type="button" class="btn btn-outline-info mb-2">SOLD OUT!</button>
+                            <!-- Widget script here -->
+                            <div class="pile-widget"></div>
+                            <script id="pile-widget" src="js/AlbertCaoQ3.js"></script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

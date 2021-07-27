@@ -1,0 +1,172 @@
+<!-- 
+Albert Cao
+07/24/21
+
+### Question 2
+
+Use modern JavaScript and HTML5 to access information from the https://restcountries.eu/ API. The goal is
+to display a list of all the capital cities for the country and all of its neighbouring countries. E.g. Searching for
+“USA” will result in a list showing "Washington, D.C.", "Ottawa", and "Mexico City".
+
+You may assume that you have access to all ES2017 features.. Hint: if your solution queries a country with N
+neighbours, it should not then make N sequential calls to the API. 
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <!-- Head -->
+    <head>
+        <title>Albert Cao - Picovoice Interview - Question 2</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    </head>
+    <!-- Style -->
+    <style>
+        body {
+            background: url('/images/map.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            color: white;
+        }
+    </style>
+    <!-- Body -->
+    <body id="body">
+        <!-- Content -->
+        <div class="container">
+            <!-- Header -->
+            <div class="row mt-5 text-center">
+                <div class="col-2 col-md-3"></div>
+                <div class="col-8 col-md-6">
+                    <h1>¿Which Capital Cities are Nearby?</h1>
+                </div>
+                <div class="col-2 col-md-3"></div>
+            </div>
+            <!-- Search bar -->
+            <div class="row mt-5 mb-5 text-center">
+                <div class="col-2 col-md-3"></div>
+                <div class="col-8 col-md-6">
+                    <div class="input-group">
+                        <input class="form-control" id="country" type="text" placeholder="Search for a country..." aria-label="Search">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" id="submit" type="submit"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-2 col-md-3"></div>
+            </div>
+            <!-- Country name -->
+            <div class="row text-center">
+                <div class="col-12">
+                    <h2 id="countryName"></h2>
+                </div>
+            </div>
+            <!-- Nearby capital cities -->
+            <div class="row text-center">
+                <div class="col-12">
+                    <h3 id="capitals"></h3>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+<!-- Script -->
+<script>
+    // Function to submit on enter keypress.
+    $(document).on("keypress", "input.form-control", function(e){
+        if (e.which == 13){
+            $(this).parent(".input-group").find("#submit").click();
+        }
+    });
+    
+    // Function to communicate with restcountries API on form submit.
+    $(document).ready(function() {
+        $("button").click(function() {
+            // Grab the value of the input.
+            var country = $("#country").val();
+
+            // Callback function to handle data.
+            function handleData(data) {
+                var allJson = $.parseJSON(JSON.stringify(data));
+                var countryName = "";
+                var borders = [];
+                var capitals = [];
+
+                // Nested AJAX GET request to retrieve info on the searched country.
+                $.ajax({
+                    url: "https://restcountries.eu/rest/v2/name/" + country + "/",
+                    type: "GET",
+                    dataType: "json",
+                    success: function(thisData) {
+                        // Filling variables with searched country info.
+                        var thisJson = $.parseJSON(JSON.stringify(thisData));
+                        countryName = thisJson[0].name;
+
+                        if (thisJson[0].capital != "") {
+                            capitals.push(thisJson[0].capital);
+                        }
+
+                        borders = thisJson[0].borders;
+
+                        // Debugging.
+                        console.log(countryName);
+                        console.log(thisJson[0].capital);
+                        console.log(thisJson);
+                        console.log(borders);
+                        console.log("Success!");
+
+                        // Display the searched country.
+                        $("#countryName").text(countryName);
+
+                        // Search the list of all countries to retrieve capitals of border countries.
+                        if (borders.length != 0) {
+                            for (let i = 0; i < borders.length; i++) {
+                                for (let j = 0; j < allJson.length; j++) {
+                                    if (allJson[j].cioc == borders[i]) {
+                                        console.log(allJson[i].cioc)
+                                        capitals.push(" " + allJson[j].capital);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Display the searched country & border countries' capitals.
+                        if (capitals.length != 0) {
+                            $("#capitals").text("Nearby Capitals: " + capitals);
+                        }
+                        else {
+                            $("#capitals").text("Nearby Capitals: None found.");
+                        }
+                    },
+                    error: function(e) {
+                        console.error("Error!");
+                        $("#countryName").text("No countries found.");
+                        $("#capitals").text("");
+                    }
+                });
+            }
+
+            // Initial AJAX GET request to retrieve list of all countries.
+            $.ajax({
+                url: "https://restcountries.eu/rest/v2/all",
+                type: "GET",
+                dataType: "json",
+                success: handleData,
+                error: function(e) {
+                    console.error("Error!");
+                    $("#countryName").text("No countries found.");
+                    $("#capitals").text("");
+                }
+            }).done(function(e) {
+                console.log("Done!");
+            }).fail(function(e)  {
+                console.error("Server unavailable!");
+            });
+        });
+    })
+</script>
